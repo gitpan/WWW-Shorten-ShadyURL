@@ -11,10 +11,10 @@ WriteMakefile(
       ? ('LICENSE'=> 'perl')
       : ()),
     PL_FILES            => {},
-    PREREQ_FATAL	=> 1,
+    PREREQ_PRINT        => 1,
     PREREQ_PM => {
         'Test::More'    => 0,
-        'WWW::Shorten'  => 0,
+        'WWW::Shorten'  => '1.90',
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'WWW-Shorten-ShadyURL-*' },

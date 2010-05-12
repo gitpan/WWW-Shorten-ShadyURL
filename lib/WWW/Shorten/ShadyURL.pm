@@ -2,7 +2,7 @@ package WWW::Shorten::ShadyURL;
 #
 #   WWW::Shorten module for shadyurl.com
 #
-#   $Id: ShadyURL.pm 134 2010-05-10 12:30:47Z infidel $
+#   $Id: ShadyURL.pm 135 2010-05-12 13:41:54Z infidel $
 #
 
 use 5.006;
@@ -12,7 +12,7 @@ use warnings;
 
 use base qw( WWW::Shorten::generic Exporter );
 our @EXPORT = qw( makeashorterlink makealongerlink );
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 
@@ -45,6 +45,9 @@ I<Don't just shorten your URL, make it suspicious and frightening.>
 
 =back
 
+I am not affiliated with them.  See L<http://shadyurl.com/> for more
+information.
+
 =head1 FUNCTIONS
 
 =head2 B<makeashorterlink>( $url [, $shorten ] )
@@ -52,11 +55,11 @@ I<Don't just shorten your URL, make it suspicious and frightening.>
 The function C<makeashorterlink> will connect to the ShadyURL web site and
 attempt to create an alias to the URL supplied.
 
-B<Arguments:>
+=head3 Arguments:
 
-$url - required. The URL you wish to shorten.
+B<$url> [required] - The URL you wish to shorten.
 
-$shorten - optional.  Set to a true value to actually create a short link.
+B<$shorten> [optional] - Set to a C<TRUE> value to actually create a short link.
 
 The ShadyURL service creates links that appear sketchy, there is no guarantee
 that they will actually be shorter than the supplied URL.  This attempts to
@@ -99,7 +102,9 @@ sub makealongerlink ($)
 {
     my $url = shift
         or croak 'No URL passed to makealongerlink';
+    print "# $url\n";
     $url =~ s/5z8\.info/www.5z8.info/;
+    print "# $url\n";
     my $ua = __PACKAGE__->ua();
 
     my $resp = $ua->get( $url );
@@ -115,20 +120,20 @@ __END__
 
 =head1 EXPORT
 
-makeashorterlink, makealongerlink
+C<makeashorterlink>, C<makealongerlink>
 
 =head1 SUPPORT, LICENCE, THANKS and SUCH
 
 See the main L<WWW::Shorten> docs.
 
-Also note: I am not affiliated with shadyurl.com.  If you have problems with
+Note: I am not affiliated with shadyurl.com.  If you have problems with
 their service, contact them.
 
 =head1 AUTHOR
 
 Jason McManus <infidel AT cpan.org>
 
-Based on WWW::Shorten by Dave Cross <dave@dave.org.uk>
+Based on WWW::Shorten by Dave Cross <dave AT dave.org.uk>
 
 =head1 SEE ALSO
 
