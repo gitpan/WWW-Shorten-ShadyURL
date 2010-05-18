@@ -2,7 +2,7 @@ package WWW::Shorten::ShadyURL;
 #
 #   WWW::Shorten module for shadyurl.com
 #
-#   $Id: ShadyURL.pm 135 2010-05-12 13:41:54Z infidel $
+#   $Id: ShadyURL.pm 141 2010-05-18 03:41:20Z infidel $
 #
 
 use 5.006;
@@ -12,9 +12,22 @@ use warnings;
 
 use base qw( WWW::Shorten::generic Exporter );
 our @EXPORT = qw( makeashorterlink makealongerlink );
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp;
+
+###
+### Vars
+###
+
+my $shortener_url = 'http://www.shadyurl.com/create.php?myUrl=';
+my $arg_sep       = '&';
+my $params        = {
+    'shorten'  => '&shorten=on',
+};
+my $url_map       = {
+    '5z8.info' => 'www.5z8.info',
+};
 
 =head1 NAME
 
@@ -71,19 +84,23 @@ sub makeashorterlink ($;$)
 {
     my $url = shift or croak 'No URL passed to makeashorterlink';
     my $shorten = shift;
-    my $ua = __PACKAGE__->ua();
-#    $url = 'http://www.shadyurl.com/create.php?myUrl=' . uri_escape( $url );
-    $url = 'http://www.shadyurl.com/create.php?myUrl=' . $url;
-    $url .= '&shorten=on' if( $shorten );
-    my $resp  = $ua->get( $url );
 
+    # Construct the request URL
+    my @url_args;
+#    $url  = $shortener_url . uri_escape( $url );
+    $url  = $shortener_url . $url;
+    push( @url_args, $params->{'shorten'} ) if( $shorten );
+    $url = join( $arg_sep, $url, @url_args );
+
+    # Get the page
+    my $ua = __PACKAGE__->ua();
+    my $resp = $ua->get( $url );
     return unless $resp->is_success;
 
-    # HTML parsing = evil, but there's no API, and I'm not going
-    # to pull in a whole parser.  If ShadyURL starts making a lot
-    # of changes, I'll do it in a later revision.  Deal.
+    # HTML manual parsing = evil, but there's no API, and I'm not going
+    # to pull in a whole parser.  If ShadyURL starts making a lot of
+    # changes, I'll do it in a later revision.  Deal.
     my $content = $resp->decoded_content;
-
     my ( $shorturl ) = $content =~ m#is now.*?href.*?\>(.*?)\</a>#;
 
     return( $shorturl );
@@ -102,13 +119,16 @@ sub makealongerlink ($)
 {
     my $url = shift
         or croak 'No URL passed to makealongerlink';
-    print "# $url\n";
-    $url =~ s/5z8\.info/www.5z8.info/;
-    print "# $url\n";
-    my $ua = __PACKAGE__->ua();
 
+    # skip unnecessary shadyURL double redirects ( canonical -> www. )
+    $url =~ s/\Q$_\E/$url_map->{$_}/  
+        for( keys( %$url_map ) );
+
+    # get Location header
+    my $ua = __PACKAGE__->ua();
     my $resp = $ua->get( $url );
     my $location = $resp->header('Location');
+
 #    return uri_unescape( $location ) if( $location );
     return $location if( $location );
     return;

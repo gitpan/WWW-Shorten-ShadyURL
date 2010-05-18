@@ -3,9 +3,17 @@ Revision history for WWW-Shorten-ShadyURL
 Legend:
 BUG:    An actual found or reported bug fix.
 FIX:    Change toward correct behavior, but unreported.
+TST:    Changes to test suite.
 DOC:    Changes to documentation.
 NEW:    New, previously non-existent feature.
 ------------------------------------------------------------
+
+0.03    May 18, 2010
+        FIX: Cleaned up some constants.
+        FIX: Removed forgotten debug code.
+        TST: Additional unit tests, including failure mode tests.
+
+        Also, shadyurl.com was down for about a week right at release.  Pfft.
 
 0.02    May 12, 2010
         FIX: Online tests were failing, as ShadyURL decided to become
